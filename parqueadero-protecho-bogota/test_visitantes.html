@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Visitantes - Protecho Bogotá II</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #e7f3ff; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Visitantes - Conjunto Residencial</h1>
+    
+    <div class="test-section">
+        <h3>1. Verificar Configuración</h3>
+        <button onclick="verificarConfiguracion()">Verificar Configuración</button>
+        <button onclick="reinicializarConfig()">Reinicializar Configuración</button>
+        <button onclick="limpiarConfigCorrupta()" style="background: #dc3545; color: white;">🔧 Limpiar Configuración Corrupta</button>
+        <div id="configResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Verificar Espacios</h3>
+        <button onclick="verificarEspacios()">Verificar Espacios</button>
+        <div id="espaciosResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. Simular Registro de Visitante</h3>
+        <button onclick="simularVisitante()">Simular Visitante</button>
+        <div id="visitanteResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. Probar Cálculo de Cobro</h3>
+        <button onclick="probarCalculo()">Probar Cálculo</button>
+        <div id="calculoResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>5. Limpiar Datos de Prueba</h3>
+        <button onclick="limpiarPruebas()">Limpiar Pruebas</button>
+        <div id="limpiarResult"></div>
+    </div>
+
+    <script src="database.js"></script>
+    <script>
+        function verificarConfiguracion() {
+            try {
+                const config = db.getConfig();
+                const result = document.getElementById('configResult');
+                
+                let html = '<div class="info">';
+                html += '<h4>✅ Configuración cargada:</h4>';
+                html += '<ul>';
+                html += `<li>Tarifa Residente Auto: $${config.tarifas.residente.automovil}</li>`;
+                html += `<li>Tarifa Residente Moto: $${config.tarifas.residente.moto}</li>`;
+                html += `<li>Tarifa Visitante Auto: $${config.tarifas.visitante.automovil}</li>`;
+                html += `<li>Tarifa Visitante Moto: $${config.tarifas.visitante.moto}</li>`;
+                html += `<li>Parqueaderos: ${config.parqueaderos.total}</li>`;
+                html += `<li>Puestos por parqueadero: ${config.parqueaderos.puestosPorParqueadero}</li>`;
+                html += `<li>Puestos de motos: ${config.puestosMotos.total}</li>`;
+                html += '</ul></div>';
+                
+                result.innerHTML = html;
+            } catch (error) {
+                document.getElementById('configResult').innerHTML = 
+                    `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function reinicializarConfig() {
+            try {
+                const config = db.reinicializarConfiguracion();
+                const result = document.getElementById('configResult');
+                
+                let html = '<div class="success">';
+                html += '<h4>✅ Configuración reinicializada:</h4>';
+                html += '<ul>';
+                html += `<li>Tarifa Residente Auto: $${config.tarifas.residente.automovil}</li>`;
+                html += `<li>Tarifa Residente Moto: $${config.tarifas.residente.moto}</li>`;
+                html += `<li>Tarifa Visitante Auto: $${config.tarifas.visitante.automovil}</li>`;
+                html += `<li>Tarifa Visitante Moto: $${config.tarifas.visitante.moto}</li>`;
+                html += '</ul></div>';
+                
+                result.innerHTML = html;
+            } catch (error) {
+                document.getElementById('configResult').innerHTML = 
+                    `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function limpiarConfigCorrupta() {
+            try {
+                const config = db.limpiarConfiguracionCorrupta();
+                const result = document.getElementById('configResult');
+                
+                let html = '<div class="success">';
+                html += '<h4>🔧 Configuración corrupta limpiada:</h4>';
+                html += '<ul>';
+                html += `<li>Tarifa Residente Auto: $${config.tarifas.residente.automovil}</li>`;
+                html += `<li>Tarifa Residente Moto: $${config.tarifas.residente.moto}</li>`;
+                html += `<li>Tarifa Visitante Auto: $${config.tarifas.visitante.automovil}</li>`;
+                html += `<li>Tarifa Visitante Moto: $${config.tarifas.visitante.moto}</li>`;
+                html += '<li><strong>Claves disponibles visitante:</strong> ' + Object.keys(config.tarifas.visitante).join(', ') + '</li>';
+                html += '<li><strong>Claves disponibles residente:</strong> ' + Object.keys(config.tarifas.residente).join(', ') + '</li>';
+                html += '</ul></div>';
+                
+                result.innerHTML = html;
+            } catch (error) {
+                document.getElementById('configResult').innerHTML = 
+                    `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function verificarEspacios() {
+            try {
+                const espacios = JSON.parse(localStorage.getItem('parqueadero_espacios'));
+                const result = document.getElementById('espaciosResult');
+                
+                const total = espacios.length;
+                const disponibles = espacios.filter(e => !e.ocupado).length;
+                const ocupados = total - disponibles;
+                
+                let html = '<div class="info">';
+                html += '<h4>📊 Estado de Espacios:</h4>';
+                html += `<p><strong>Total:</strong> ${total}</p>`;
+                html += `<p><strong>Disponibles:</strong> ${disponibles}</p>`;
+                html += `<p><strong>Ocupados:</strong> ${ocupados}</p>`;
+                
+                // Mostrar algunos espacios disponibles
+                const disponiblesList = espacios.filter(e => !e.ocupado).slice(0, 5);
+                html += '<p><strong>Primeros 5 espacios disponibles:</strong></p><ul>';
+                disponiblesList.forEach(espacio => {
+                    html += `<li>${espacio.id} (Parqueadero ${espacio.parqueadero}, Puesto ${espacio.puesto})</li>`;
+                });
+                html += '</ul></div>';
+                
+                result.innerHTML = html;
+            } catch (error) {
+                document.getElementById('espaciosResult').innerHTML = 
+                    `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function simularVisitante() {
+            try {
+                const datosVisitante = {
+                    placa: 'ABC123',
+                    tipo: 'automovil',
+                    propietario: 'Juan Pérez',
+                    direccion: 'Visitante',
+                    telefono: '3001234567',
+                    numeroParqueadero: null,
+                    numeroPuesto: null,
+                    esResidente: 'false',
+                    observaciones: 'Prueba de visitante'
+                };
+                
+                console.log('Intentando registrar visitante:', datosVisitante);
+                
+                const vehiculo = db.registrarEntrada(datosVisitante);
+                
+                const result = document.getElementById('visitanteResult');
+                let html = '<div class="success">';
+                html += '<h4>✅ Visitante registrado exitosamente:</h4>';
+                html += '<ul>';
+                html += `<li><strong>Placa:</strong> ${vehiculo.placa}</li>`;
+                html += `<li><strong>Tipo:</strong> ${vehiculo.tipo}</li>`;
+                html += `<li><strong>Es Residente:</strong> ${vehiculo.esResidente ? 'Sí' : 'No'}</li>`;
+                html += `<li><strong>Parqueadero:</strong> ${vehiculo.numeroParqueadero}</li>`;
+                html += `<li><strong>Puesto:</strong> ${vehiculo.numeroPuesto}</li>`;
+                html += `<li><strong>Espacio:</strong> ${vehiculo.espacio}</li>`;
+                html += '</ul></div>';
+                
+                result.innerHTML = html;
+            } catch (error) {
+                document.getElementById('visitanteResult').innerHTML = 
+                    `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function limpiarPruebas() {
+            try {
+                // Buscar y eliminar vehículos de prueba
+                const vehiculos = db.getAllVehiculos();
+                const vehiculosPrueba = vehiculos.filter(v => 
+                    v.placa === 'ABC123' || v.direccion === 'Visitante'
+                );
+                
+                if (vehiculosPrueba.length > 0) {
+                    // Marcar como inactivos
+                    vehiculosPrueba.forEach(v => {
+                        v.activo = false;
+                        v.salida = new Date().toISOString();
+                    });
+                    
+                    // Liberar espacios
+                    const espacios = JSON.parse(localStorage.getItem('parqueadero_espacios'));
+                    vehiculosPrueba.forEach(v => {
+                        const espacio = espacios.find(e => e.id === v.espacio);
+                        if (espacio) {
+                            espacio.ocupado = false;
+                            espacio.vehiculo = null;
+                        }
+                    });
+                    
+                    localStorage.setItem('parqueadero_vehiculos', JSON.stringify(vehiculos));
+                    localStorage.setItem('parqueadero_espacios', JSON.stringify(espacios));
+                }
+                
+                document.getElementById('limpiarResult').innerHTML = 
+                    `<div class="success">✅ Datos de prueba limpiados correctamente</div>`;
+            } catch (error) {
+                document.getElementById('limpiarResult').innerHTML = 
+                    `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        function probarCalculo() {
+            try {
+                // Primero registrar un visitante si no existe
+                let vehiculo = db.buscarVehiculo('ABC123');
+                if (!vehiculo || !vehiculo.activo) {
+                    const datosVisitante = {
+                        placa: 'ABC123',
+                        tipo: 'automovil',
+                        propietario: 'Juan Pérez',
+                        direccion: 'Visitante',
+                        telefono: '3001234567',
+                        numeroParqueadero: null,
+                        numeroPuesto: null,
+                        esResidente: 'false',
+                        observaciones: 'Prueba de cálculo'
+                    };
+                    
+                    vehiculo = db.registrarEntrada(datosVisitante);
+                }
+                
+                // Simular que pasó tiempo (2 horas)
+                const entradaOriginal = new Date(vehiculo.entrada);
+                const nuevaEntrada = new Date(entradaOriginal.getTime() - (2 * 60 * 60 * 1000)); // 2 horas atrás
+                vehiculo.entrada = nuevaEntrada.toISOString();
+                
+                // Actualizar en localStorage
+                const vehiculos = db.getAllVehiculos();
+                const vehiculoIndex = vehiculos.findIndex(v => v.id === vehiculo.id);
+                if (vehiculoIndex !== -1) {
+                    vehiculos[vehiculoIndex] = vehiculo;
+                    localStorage.setItem('parqueadero_vehiculos', JSON.stringify(vehiculos));
+                }
+                
+                // Calcular cobro
+                const cobro = db.calcularCobro('ABC123');
+                
+                const result = document.getElementById('calculoResult');
+                let html = '<div class="success">';
+                html += '<h4>✅ Cálculo de cobro para visitante:</h4>';
+                html += '<ul>';
+                html += `<li><strong>Placa:</strong> ${cobro.vehiculo.placa}</li>`;
+                html += `<li><strong>Tipo:</strong> ${cobro.vehiculo.tipo}</li>`;
+                html += `<li><strong>Es Visitante:</strong> ${cobro.esVisitante ? 'Sí' : 'No'}</li>`;
+                html += `<li><strong>Tiempo (ms):</strong> ${cobro.tiempoMs}</li>`;
+                html += `<li><strong>Horas:</strong> ${cobro.horas.toFixed(2)}</li>`;
+                html += `<li><strong>Períodos de 12h:</strong> ${cobro.periodos12Horas}</li>`;
+                html += `<li><strong>Tarifa por 12h:</strong> $${cobro.tarifa12Horas}</li>`;
+                html += `<li><strong>Subtotal:</strong> $${cobro.subtotal}</li>`;
+                html += `<li><strong>Tarifa usando getTarifa():</strong> $${db.getTarifa('camioneta', false)}</li>`;
+                html += '</ul></div>';
+                
+                result.innerHTML = html;
+                
+                console.log('Cálculo de cobro:', cobro);
+                
+            } catch (error) {
+                document.getElementById('calculoResult').innerHTML = 
+                    `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Verificar configuración al cargar
+        window.onload = function() {
+            verificarConfiguracion();
+            verificarEspacios();
+        };
+    </script>
+</body>
+</html> 

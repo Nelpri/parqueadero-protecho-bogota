@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Parqueadero -  Protecho Bogotá II</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-parking"></i>
+                <h1>Protecho Bogotá II</h1>
+                <span>Sistema de Parqueadero </span>
+            </div>
+            <div class="header-info">
+                <div class="current-time" id="currentTime"></div>
+                <div class="user-info">
+                    <i class="fas fa-user"></i>
+                    <span id="currentUser">Operador</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="entrada">
+            <i class="fas fa-sign-in-alt"></i>
+            Entrada
+        </button>
+        <button class="nav-tab" data-tab="salida">
+            <i class="fas fa-sign-out-alt"></i>
+            Salida
+        </button>
+        <button class="nav-tab" data-tab="vehiculos">
+            <i class="fas fa-car"></i>
+            Vehículos
+        </button>
+        <button class="nav-tab" data-tab="reportes">
+            <i class="fas fa-chart-bar"></i>
+            Reportes
+        </button>
+        <button class="nav-tab" data-tab="configuracion">
+            <i class="fas fa-cog"></i>
+            Configuración
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Overview -->
+        <div class="dashboard-overview">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="vehiculosActivos">0</h3>
+                    <p>Vehículos Activos</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-parking"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="espaciosDisponibles">68</h3>
+                    <p>Espacios Disponibles</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="ingresosHoy">$0</h3>
+                    <p>Ingresos Hoy</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="ocupacion">0%</h3>
+                    <p>Ocupación</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Entrada Tab -->
+            <div id="entrada" class="tab-pane active">
+                <div class="form-container">
+                    <h2><i class="fas fa-sign-in-alt"></i> Registro de Entrada</h2>
+                    <form id="entradaForm" class="parking-form">
+                        <div class="form-group">
+                            <label for="placaEntrada">Placa del Vehículo:</label>
+                            <input type="text" id="placaEntrada" name="placa" placeholder="ABC123" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipoVehiculo">Tipo de Vehículo:</label>
+                            <select id="tipoVehiculo" name="tipo" required>
+                                <option value="">Seleccionar tipo</option>
+                                <option value="automovil">Automóvil</option>
+                                <option value="camioneta">Camioneta</option>
+                                <option value="moto">Moto</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="propietario">Propietario/Residente:</label>
+                            <input type="text" id="propietario" name="propietario" placeholder="Nombre completo del propietario" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="direccion">Casa:</label>
+                            <input type="text" id="direccion" name="direccion" placeholder="Ej: Casa 15, Casa 23" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono">Teléfono:</label>
+                            <input type="tel" id="telefono" name="telefono" placeholder="Número de teléfono" required>
+                        </div>
+                        <div class="form-group" id="parqueaderoGroup">
+                            <label for="numeroParqueadero">Número de Parqueadero:</label>
+                            <select id="numeroParqueadero" name="numeroParqueadero">
+                                <option value="">Seleccionar parqueadero</option>
+                                <option value="1">Parqueadero 1</option>
+                                <option value="2">Parqueadero 2</option>
+                                <option value="3">Parqueadero 3</option>
+                                <option value="4">Parqueadero 4</option>
+                            </select>
+                            <small class="form-help">Solo para residentes con puesto fijo</small>
+                        </div>
+                        <div class="form-group" id="puestoGroup">
+                            <label for="numeroPuesto">Número de Puesto:</label>
+                            <select id="numeroPuesto" name="numeroPuesto">
+                                <option value="">Seleccionar puesto</option>
+                                <!-- Se llenará dinámicamente -->
+                            </select>
+                            <small class="form-help">Solo para residentes con puesto fijo</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="esResidente">Tipo de Usuario:</label>
+                            <select id="esResidente" name="esResidente" required>
+                                <option value="">Seleccionar tipo</option>
+                                <option value="true">Residente del Conjunto (Puesto fijo, pago mensual)</option>
+                                <option value="false">Visitante (Pago por 12 horas)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="observacionesEntrada">Observaciones:</label>
+                            <textarea id="observacionesEntrada" name="observaciones" placeholder="Observaciones adicionales..."></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Registrar Entrada
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="limpiarFormulario('entradaForm')">
+                                <i class="fas fa-eraser"></i> Limpiar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Salida Tab -->
+            <div id="salida" class="tab-pane">
+                <div class="form-container">
+                    <h2><i class="fas fa-sign-out-alt"></i> Registro de Salida</h2>
+                    <form id="salidaForm" class="parking-form">
+                        <div class="form-group">
+                            <label for="placaSalida">Placa del Vehículo:</label>
+                            <input type="text" id="placaSalida" name="placa" placeholder="ABC123" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="metodoPago">Método de Pago:</label>
+                            <select id="metodoPago" name="metodoPago" required>
+                                <option value="">Seleccionar método</option>
+                                <option value="efectivo">Efectivo</option>
+                                <option value="tarjeta">Tarjeta</option>
+                                <option value="transferencia">Transferencia</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="descuento">Descuento (%):</label>
+                            <input type="number" id="descuento" name="descuento" min="0" max="100" value="0">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-calculator"></i> Calcular y Cobrar
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="limpiarFormulario('salidaForm')">
+                                <i class="fas fa-eraser"></i> Limpiar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div id="resultadoSalida" class="resultado-salida" style="display: none;">
+                    <h3>Resumen de Cobro</h3>
+                    <div class="resumen-cobro">
+                        <div class="resumen-item">
+                            <span>Tiempo de Estacionamiento:</span>
+                            <span id="tiempoEstacionamiento">-</span>
+                        </div>
+                        <div class="resumen-item">
+                            <span>Tarifa:</span>
+                            <span id="tarifaHora">-</span>
+                        </div>
+                        <div class="resumen-item">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">-</span>
+                        </div>
+                        <div class="resumen-item">
+                            <span>Descuento:</span>
+                            <span id="descuentoCalculado">-</span>
+                        </div>
+                        <div class="resumen-item total">
+                            <span>Total a Pagar:</span>
+                            <span id="totalPagar">-</span>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-success" onclick="confirmarSalida()">
+                            <i class="fas fa-check"></i> Confirmar Salida
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="cancelarSalida()">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehículos Tab -->
+            <div id="vehiculos" class="tab-pane">
+                <div class="vehiculos-container">
+                    <div class="vehiculos-header">
+                        <h2><i class="fas fa-car"></i> Vehículos en Parqueadero</h2>
+                        <div class="search-box">
+                            <input type="text" id="buscarVehiculo" placeholder="Buscar por placa, propietario o casa...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                    <div class="vehiculos-grid" id="vehiculosGrid">
+                        <!-- Los vehículos se cargarán dinámicamente aquí -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reportes Tab -->
+            <div id="reportes" class="tab-pane">
+                <div class="reportes-container">
+                    <h2><i class="fas fa-chart-bar"></i> Reportes y Estadísticas</h2>
+                    
+                    <!-- Botones de reportes rápidos -->
+                    <div class="reportes-rapidos">
+                        <button class="btn btn-success" onclick="generarReporteHoy()">
+                            <i class="fas fa-calendar-day"></i> Reporte de Hoy
+                        </button>
+                        <button class="btn btn-info" onclick="generarReporteMes()">
+                            <i class="fas fa-calendar-alt"></i> Reporte del Mes
+                        </button>
+                        <button class="btn btn-warning" onclick="generarReporteOcupacion()">
+                            <i class="fas fa-parking"></i> Ocupación Actual
+                        </button>
+                    </div>
+                    
+                    <div class="reportes-filtros">
+                        <h3>Reporte por Rango de Fechas</h3>
+                        <div class="filtro-grupo">
+                            <label for="fechaInicio">Fecha Inicio:</label>
+                            <input type="date" id="fechaInicio">
+                        </div>
+                        <div class="filtro-grupo">
+                            <label for="fechaFin">Fecha Fin:</label>
+                            <input type="date" id="fechaFin">
+                        </div>
+                        <button class="btn btn-primary" onclick="generarReporte()">
+                            <i class="fas fa-search"></i> Generar Reporte
+                        </button>
+                    </div>
+
+                    <!-- Estadísticas principales -->
+                    <div class="reportes-stats">
+                        <div class="stat-card">
+                            <h3>Ingresos Totales</h3>
+                            <p id="ingresosTotales">$0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Vehículos Atendidos</h3>
+                            <p id="vehiculosAtendidos">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Promedio por Vehículo</h3>
+                            <p id="promedioVehiculo">$0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Residentes</h3>
+                            <p id="residentesAtendidos">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Visitantes</h3>
+                            <p id="visitantesAtendidos">0</p>
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas detalladas -->
+                    <div class="reportes-detalladas" id="reportesDetalladas" style="display: none;">
+                        <div class="stats-section">
+                            <h3>Estadísticas por Tipo de Vehículo</h3>
+                            <div id="statsPorTipo" class="stats-grid"></div>
+                        </div>
+                        
+                        <div class="stats-section">
+                            <h3>Estadísticas por Método de Pago</h3>
+                            <div id="statsPorPago" class="stats-grid"></div>
+                        </div>
+                        
+                        <div class="stats-section" id="statsOcupacion" style="display: none;">
+                            <h3>Ocupación por Parqueadero</h3>
+                            <div id="statsPorParqueadero" class="stats-grid"></div>
+                        </div>
+                    </div>
+
+                    <div class="reportes-tabla">
+                        <h3>Historial de Transacciones</h3>
+                        <div class="table-container">
+                            <table id="tablaTransacciones">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Placa</th>
+                                        <th>Tipo</th>
+                                        <th>Casa</th>
+                                        <th>Usuario</th>
+                                        <th>Entrada</th>
+                                        <th>Salida</th>
+                                        <th>Duración</th>
+                                        <th>Tarifa</th>
+                                        <th>Total</th>
+                                        <th>Pago</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transaccionesBody">
+                                    <!-- Los datos se cargarán dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración Tab -->
+            <div id="configuracion" class="tab-pane">
+                <div class="configuracion-container">
+                    <h2><i class="fas fa-cog"></i> Configuración del Sistema</h2>
+                    
+                    <div class="config-section">
+                        <h3>Tarifas Fijas del Conjunto</h3>
+                        <div class="info-box">
+                            <p><strong>Tarifas Residentes (Mensuales):</strong></p>
+                            <ul>
+                                <li>Automóviles y Camionetas: $150,800</li>
+                                <li>Motos: $80,000</li>
+                            </ul>
+                            <p><strong>Tarifas Visitantes (Por 12 horas):</strong></p>
+                            <ul>
+                                <li>Automóviles y Camionetas: $5,000</li>
+                                <li>Motos: $3,000</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h3>Estructura del Conjunto Residencial</h3>
+                        <div class="info-box">
+                            <p><strong>Conjunto Residencial de Casas:</strong></p>
+                            <ul>
+                                <li>4 parqueaderos comunales numerados del 1 al 4</li>
+                                <li>Parqueadero 1: 80 puestos</li>
+                                <li>Parqueadero 2: 115 puestos</li>
+                                <li>Parqueadero 3: 50 puestos</li>
+                                <li>Parqueadero 4: 40 puestos</li>
+                                <li>Total: 285 espacios para automóviles y camionetas</li>
+                                <li>20 puestos especiales para motos (área exterior)</li>
+                                <li>Total general: 305 espacios disponibles</li>
+                                <li>Los residentes tienen puestos fijos asignados</li>
+                                <li>Los visitantes pagan tarifa por 12 horas</li>
+                                <li>Dirección: Número de casa (Ej: Casa 15, Casa 23)</li>
+                                <li><strong>Horario de operación: 24 horas</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="config-section">
+                        <h3>Mantenimiento del Sistema</h3>
+                        <div class="backup-actions">
+                            <button class="btn btn-info" onclick="reinicializarSistema()">
+                                <i class="fas fa-sync-alt"></i> Reinicializar Sistema
+                            </button>
+                            <button class="btn btn-danger" onclick="limpiarConfiguracionCorrupta()">
+                                <i class="fas fa-wrench"></i> Limpiar Configuración Corrupta
+                            </button>
+                            <button class="btn btn-success" onclick="exportarDatos()">
+                                <i class="fas fa-download"></i> Exportar Datos
+                            </button>
+                            <button class="btn btn-warning" onclick="importarDatos()">
+                                <i class="fas fa-upload"></i> Importar Datos
+                            </button>
+                            <button class="btn btn-primary" onclick="importarUsuariosExcel()">
+                                <i class="fas fa-file-excel"></i> Importar Usuarios Excel
+                            </button>
+                            <button class="btn btn-secondary" onclick="actualizarHorario24Horas()">
+                                <i class="fas fa-clock"></i> Actualizar a 24 Horas
+                            </button>
+                            <input type="file" id="importFile" accept=".json" style="display: none;">
+                            <input type="file" id="importExcelFile" accept=".xlsx,.xls,.csv" style="display: none;">
+                        </div>
+                        <div class="info-box" style="margin-top: 15px;">
+                            <p><strong>Nota:</strong> Use "Reinicializar Sistema" si tiene problemas. Esto limpiará todos los datos y reinicializará el sistema con la configuración por defecto.</p>
+                        </div>
+                        
+                        <div class="config-section">
+                            <h3>Importar Usuarios desde Excel</h3>
+                            <div class="info-box">
+                                <p><strong>Formato del archivo Excel:</strong></p>
+                                <p>El archivo debe tener las siguientes columnas (en este orden):</p>
+                                <ul>
+                                    <li><strong>Placa:</strong> Placa del vehículo (ej: ABC123)</li>
+                                    <li><strong>Tipo:</strong> Tipo de vehículo (automovil, camioneta, moto)</li>
+                                    <li><strong>Propietario:</strong> Nombre completo del propietario</li>
+                                    <li><strong>Casa:</strong> Número de casa (ej: Casa 15)</li>
+                                    <li><strong>Teléfono:</strong> Número de teléfono</li>
+                                    <li><strong>Es Residente:</strong> true/false o Sí/No</li>
+                                    <li><strong>Parqueadero:</strong> Número de parqueadero (1-4, solo para residentes)</li>
+                                    <li><strong>Puesto:</strong> Número de puesto (1-12, solo para residentes)</li>
+                                </ul>
+                                <p><strong>Nota:</strong> Los residentes deben tener parqueadero y puesto asignados. Los visitantes pueden dejar estos campos vacíos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Notifications -->
+    <div id="notifications" class="notifications"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="database.js"></script>
+    <script src="utils.js"></script>
+    <script src="app.js"></script>
+</body>
+</html> 

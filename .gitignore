@@ -1,0 +1,36 @@
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de configuración de editores
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Archivos de respaldo y temporales
+*.bak
+*~
+*.tmp
+
+# Archivos de entorno (por si acaso)
+.env
+.env.*
+
+# node_modules (por si en el futuro usas npm)
+node_modules/
+
+# Archivos de pruebas o personales (ajusta si tienes otros)
+limpiar_db.html
+limpiar_base_datos.html
+limpiar_espacios.html
+test_formulario.html
+debug_formulario.html
+
+# Archivos de Excel o CSV de ejemplo
+*.csv
+*.xlsx
+*.xls
+
+# Otros archivos que no quieras subir
+# (agrega aquí si tienes más) 
