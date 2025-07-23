@@ -196,5 +196,5 @@ Las contribuciones son bienvenidas:
 
 ---
 
-**Desarrollado para Protecho Bogotá II** 🏠  
+**Desarrollado por Nelson Prieto, para Protecho Bogotá II** 🏠  
 *Sistema de gestión de parqueaderos residenciales* 
